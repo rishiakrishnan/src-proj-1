@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: us-east-1
+    CLUSTER_NAME: my-eks-cluster
+    IMAGE_REPO_NAME: first-try
+    IMAGE_TAG: latest
+
+phases:
+  pre_build:
+    commands:
+      - echo Updating kubeconfig
+      - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $CLUSTER_NAME
+
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+
+  build:
+    commands:
+      - echo Updating Kubernetes deployment
+      - kubectl set image deployment/my-deployment my-container=$REPOSITORY_URI:$IMAGE_TAG
