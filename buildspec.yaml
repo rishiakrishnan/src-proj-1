@@ -5,7 +5,6 @@ env:
     AWS_DEFAULT_REGION: us-east-1
     IMAGE_REPO_NAME: first-try
     IMAGE_TAG: latest
-    CLUSTER_NAME: my-eks-test   # Add your EKS cluster name here
 
 phases:
   pre_build:
@@ -15,20 +14,9 @@ phases:
       - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
-      - echo Updating kubeconfig for EKS cluster...
-      - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $CLUSTER_NAME
-
-
-      # - echo Logging in to Amazon ECR...
-      # - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      # - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
-      # - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
-
-      # - echo Logging in to Docker Hub...
+      - echo Logging in to Docker Hub...
       - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
 
-      # - echo Updating kubeconfig for EKS cluster...
-      # - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $CLUSTER_NAME
 
   build:
     commands:
@@ -42,5 +30,3 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Build completed on `date`
-      - echo Updating Kubernetes deployment
-      - kubectl set image deployment/my-deployment my-container=$REPOSITORY_URI:$IMAGE_TAG
