@@ -15,4 +15,4 @@ phases:
     commands:
       - echo Deploying to Kubernetes
       - kubectl apply -f deployment.yaml
-      - kubectl rollout restart deployment my-app
+      - kubectl rollout restart deployment my-deployment
